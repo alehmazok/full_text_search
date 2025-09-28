@@ -4,8 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'matching.dart';
 import 'scoring.dart';
 
-class TermSearchResults<T> extends DelegatingList<TermSearchResult<T>>
-    implements Equatable {
+class TermSearchResults<T> extends DelegatingList<TermSearchResult<T>> implements Equatable {
   List<TermSearchResult<T>> get results => this;
 
   TermSearchResults(List<TermSearchResult<T>> results) : super(results);
@@ -20,8 +19,7 @@ class TermSearchResults<T> extends DelegatingList<TermSearchResult<T>>
 }
 
 // ignore: must_be_immutable
-class TermSearchResult<T> extends Equatable
-    implements Comparable<TermSearchResult<T>> {
+class TermSearchResult<T> extends Equatable implements Comparable<TermSearchResult<T>> {
   final Score score;
 
   final T result;
@@ -47,22 +45,17 @@ class TermSearchResult<T> extends Equatable
     return _scoreValue ??= score.calculate();
   }
 
-  TermSearchResult(
-      this.result, this.matchedTerms, this.matchedTokens, this.matchAll)
-      : score = Score.zero();
+  TermSearchResult(this.result, this.matchedTerms, this.matchedTokens, this.matchAll)
+    : score = Score.zero();
 
   @override
-  int compareTo(lhs) {
-    if (lhs is TermSearchResult<T>) {
-      final rhs = this;
-      if (lhs == rhs) return 0;
-      var scoreA = rhs.scoreValue;
-      var scoreB = lhs.scoreValue;
-      if (scoreA == 0 && scoreB == 0) return 1;
-      return scoreB.compareTo(scoreA);
-    } else {
-      return -1;
-    }
+  int compareTo(TermSearchResult<T> lhs) {
+    final rhs = this;
+    if (lhs == rhs) return 0;
+    var scoreA = rhs.scoreValue;
+    var scoreB = lhs.scoreValue;
+    if (scoreA == 0 && scoreB == 0) return 1;
+    return scoreB.compareTo(scoreA);
   }
 
   @override
@@ -116,8 +109,6 @@ extension TokenCheckResultExt on TokenCheckResult {
         return other == TokenCheckResult.none;
       case TokenCheckResult.none:
         return false;
-      default:
-        return false;
     }
   }
 }
@@ -126,9 +117,7 @@ class FTSToken extends Equatable {
   final String token;
   final String name;
 
-  FTSToken(String token, {String? name})
-      : token = token.toLowerCase(),
-        name = name ?? token;
+  FTSToken(String token, {String? name}) : token = token.toLowerCase(), name = name ?? token;
 
   bool equals(String term) => token == term;
 

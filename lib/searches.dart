@@ -54,15 +54,16 @@ class FullTextSearch<T> {
     List<SearchScoring>? additionalScorers,
     List<TermMatcher>? additionalMatchers,
   }) : this._(
-            term,
-            Stream.fromIterable(items),
-            isMatchAll,
-            isStartsWith,
-            ignoreCase,
-            limit,
-            tokenize,
-            [..._defaultScoring, ...?additionalScorers],
-            [..._defaultMatchers, ...?additionalMatchers]);
+         term,
+         Stream.fromIterable(items),
+         isMatchAll,
+         isStartsWith,
+         ignoreCase,
+         limit,
+         tokenize,
+         [..._defaultScoring, ...?additionalScorers],
+         [..._defaultMatchers, ...?additionalMatchers],
+       );
 
   FullTextSearch.ofStream({
     required String term,
@@ -75,15 +76,16 @@ class FullTextSearch<T> {
     List<SearchScoring>? additionalScorers,
     List<TermMatcher>? additionalMatchers,
   }) : this._(
-            term,
-            items ?? Stream<T>.empty(),
-            isMatchAll,
-            isStartsWith,
-            ignoreCase,
-            limit,
-            tokenize,
-            [..._defaultScoring, ...?additionalScorers],
-            [..._defaultMatchers, ...?additionalMatchers]);
+         term,
+         items ?? Stream<T>.empty(),
+         isMatchAll,
+         isStartsWith,
+         ignoreCase,
+         limit,
+         tokenize,
+         [..._defaultScoring, ...?additionalScorers],
+         [..._defaultMatchers, ...?additionalMatchers],
+       );
 
   /// Matches items in an array with user-provided search string.  The input is split into multiple terms, and there is an option
   /// to ensure that each term is matched within the tokens.
@@ -95,31 +97,39 @@ class FullTextSearch<T> {
   /// [limit] The number of results to return
   /// [tokenize] Determines how each item in [items] should produce searchable tokens
   /// [scorers] Scorers
-  FullTextSearch.scoring(
-      {required String term,
-      required Stream<T> items,
-      bool isMatchAll = false,
-      bool isStartsWith = true,
-      bool ignoreCase = true,
-      int? limit,
-      required Tokenizer<T> tokenize,
-      List<SearchScoring>? scorers,
-      List<TermMatcher>? matchers})
-      : this._(
-          term,
-          items,
-          isMatchAll,
-          isStartsWith,
-          ignoreCase,
-          limit,
-          tokenize,
-          [...?scorers],
-          [...?matchers],
-        );
+  FullTextSearch.scoring({
+    required String term,
+    required Stream<T> items,
+    bool isMatchAll = false,
+    bool isStartsWith = true,
+    bool ignoreCase = true,
+    int? limit,
+    required Tokenizer<T> tokenize,
+    List<SearchScoring>? scorers,
+    List<TermMatcher>? matchers,
+  }) : this._(
+         term,
+         items,
+         isMatchAll,
+         isStartsWith,
+         ignoreCase,
+         limit,
+         tokenize,
+         [...?scorers],
+         [...?matchers],
+       );
 
-  FullTextSearch._(this.term, this.items, this.isMatchAll, this.isStartsWith,
-      this.ignoreCase, this.limit, this.tokenize, this.scorers, this.matchers)
-      : assert(scorers.isNotEmpty, 'Must have at least one scorer') {
+  FullTextSearch._(
+    this.term,
+    this.items,
+    this.isMatchAll,
+    this.isStartsWith,
+    this.ignoreCase,
+    this.limit,
+    this.tokenize,
+    this.scorers,
+    this.matchers,
+  ) : assert(scorers.isNotEmpty, 'Must have at least one scorer') {
     matchers.sort();
   }
 
@@ -162,7 +172,7 @@ class FullTextSearch<T> {
     final Set<String> terms = search.term
         .toString()
         .split(searchTermTokenizer)
-        .where((_) => _ != '')
+        .where((it) => it != '')
         .toSet();
 
     Stream<TokenizedItem<T>> tokens = (search.items).map((item) {
@@ -176,8 +186,7 @@ class FullTextSearch<T> {
       }).notNullSet();
       return TokenizedItem(tokens, item);
     });
-    Stream<TermSearchResult<T>> matches =
-        tokens.expand((TokenizedItem<T> item) {
+    Stream<TermSearchResult<T>> matches = tokens.expand((TokenizedItem<T> item) {
       // Creates a cross-product of tokens and terms
       Iterable<TermMatch> matching = item.tokens.expand((token) {
         return terms.expand((_term) {
@@ -193,8 +202,7 @@ class FullTextSearch<T> {
 
       if (matching.isEmpty) return [];
 
-      final matchedTerms =
-          matching.map((TermMatch match) => match.term).toSet();
+      final matchedTerms = matching.map((TermMatch match) => match.term).toSet();
       final matchedTokens = matching.toSet();
       final termResult = TermSearchResult(
         item.result,
@@ -203,8 +211,7 @@ class FullTextSearch<T> {
         matchedTerms.length >= terms.length,
       );
       log.fine('Scorers: $scorers');
-      search.scorers.forEach(
-          (scorer) => scorer.scoreTerm(search, termResult, termResult.score));
+      search.scorers.forEach((scorer) => scorer.scoreTerm(search, termResult, termResult.score));
       termResult.scoreValue;
       return [termResult];
     });
@@ -243,8 +250,4 @@ const List<SearchScoring> _defaultScoring = [
   MatchedTermsScoring(),
 ];
 
-final List<TermMatcher> _defaultMatchers = [
-  EqualsMatch(),
-  StartsWithMatch(),
-  ContainsMatch(),
-];
+final List<TermMatcher> _defaultMatchers = [EqualsMatch(), StartsWithMatch(), ContainsMatch()];
