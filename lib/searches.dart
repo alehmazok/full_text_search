@@ -2,10 +2,10 @@
 import 'dart:core';
 
 import 'package:logging/logging.dart';
-import 'package:sunny_dart/sunny_dart.dart' hide Token;
 
 import 'matching.dart';
 import 'scoring.dart';
+import 'stream_sort_sample.dart';
 import 'term_search_result.dart';
 
 typedef Tokenizer<T> = List<dynamic> Function(T input);
@@ -251,3 +251,32 @@ const List<SearchScoring> _defaultScoring = [
 ];
 
 final List<TermMatcher> _defaultMatchers = [EqualsMatch(), StartsWithMatch(), ContainsMatch()];
+
+extension StringExt on String {
+  bool get isBlank {
+    return this.trim().isEmpty;
+  }
+
+  bool get isNotBlank {
+    return this.trim().isNotEmpty;
+  }
+}
+
+extension StringNullableExt on String? {
+  bool get isNotNullOrBlank {
+    return this != null && this!.isNotBlank;
+  }
+
+  bool get isNullOrBlank {
+    return this == null || this!.isBlank;
+  }
+}
+
+extension IterableExt<V> on Iterable<V?> {
+  Set<V> notNullSet() {
+    return <V>{
+      for (var i in this)
+        if (i != null) i,
+    };
+  }
+}
